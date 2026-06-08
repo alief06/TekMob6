@@ -4,6 +4,7 @@ import 'core/theme/app_theme.dart';
 import 'data/database/database_helper.dart';
 import 'data/repositories/report_repository.dart';
 import 'providers/report_provider.dart';
+import 'providers/user_provider.dart';
 import 'screens/main_screen.dart';
 
 void main() {
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ReportProvider(repository)),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: MaterialApp(
         title: 'LaporCepat',

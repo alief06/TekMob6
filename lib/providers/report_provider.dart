@@ -13,6 +13,27 @@ class ReportProvider extends ChangeNotifier {
   List<Report> _reports = [];
   List<Report> get reports => _reports;
 
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+
+  String _searchQuery = '';
+  String get searchQuery => _searchQuery;
+
+  List<Report> get filteredReports {
+    if (_searchQuery.isEmpty) {
+      return _reports;
+    }
+    return _reports.where((report) {
+      return report.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+             report.description.toLowerCase().contains(_searchQuery.toLowerCase());
+    }).toList();
+  }
+
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
+  }
+
   String? _currentImagePath;
   String? get currentImagePath => _currentImagePath;
 
@@ -27,12 +48,17 @@ class ReportProvider extends ChangeNotifier {
 
   Future<void> fetchReports() async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
-    _reports = await _repository.getReports();
-    
-    _isLoading = false;
-    notifyListeners();
+    try {
+      _reports = await _repository.getReports();
+    } catch (e) {
+      _errorMessage = 'Gagal memuat laporan: $e';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> pickImage() async {

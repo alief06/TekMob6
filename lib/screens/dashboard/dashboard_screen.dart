@@ -25,8 +25,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       body: Consumer<ReportProvider>(
         builder: (context, provider, child) {
-          final totalReports = provider.reports.length;
-          final todayReports = provider.reports.where((r) {
+          final totalReports = provider.filteredReports.length;
+          final todayReports = provider.filteredReports.where((r) {
             final date = DateTime.parse(r.createdAt);
             final now = DateTime.now();
             return date.year == now.year && date.month == now.month && date.day == now.day;
@@ -38,26 +38,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildHeader(context),
-                Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        'Ringkasan',
-                        style: Theme.of(context).textTheme.titleLarge,
+                if (provider.isLoading)
+                  const Padding(
+                    padding: EdgeInsets.all(40.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (provider.errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.all(40.0),
+                    child: Center(
+                      child: Text(
+                        provider.errorMessage!,
+                        style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(child: _buildSummaryCard(context, 'Total Laporan', totalReports.toString(), Icons.folder_open)),
-                          const SizedBox(width: 16),
-                          Expanded(child: _buildSummaryCard(context, 'Hari Ini', todayReports.toString(), Icons.today)),
-                        ],
-                      ),
-                    ],
+                    ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Ringkasan',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(child: _buildSummaryCard(context, 'Total Laporan', totalReports.toString(), Icons.folder_open)),
+                            const SizedBox(width: 16),
+                            Expanded(child: _buildSummaryCard(context, 'Hari Ini', todayReports.toString(), Icons.today)),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           );
@@ -104,6 +121,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               borderRadius: BorderRadius.circular(24),
             ),
             child: TextField(
+              onChanged: (value) => Provider.of<ReportProvider>(context, listen: false).setSearchQuery(value),
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: 'Cari laporan...',

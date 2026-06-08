@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
+import '../../providers/user_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -9,13 +11,15 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 32,
-          ).copyWith(bottom: 120),
-          child: Column(
-            children: [
+        child: Consumer<UserProvider>(
+          builder: (context, userProvider, child) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 32,
+              ).copyWith(bottom: 120),
+              child: Column(
+                children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -77,7 +81,7 @@ class ProfileScreen extends StatelessWidget {
                         color: AppColors.primaryLight.withOpacity(0.3),
                         width: double.infinity,
                         child: Image.asset(
-                          'assets/images/profile.png',
+                          userProvider.profileImagePath,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return const Center(
@@ -97,18 +101,18 @@ class ProfileScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Alief Al Ikhsan',
-                            style: TextStyle(
+                          Text(
+                            userProvider.name,
+                            style: const TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.bold,
                               color: AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 8),
-                          const Text(
-                            'Warga yang aktif melaporkan kejadian di sekitar untuk lingkungan yang lebih baik dan aman.',
-                            style: TextStyle(
+                          Text(
+                            userProvider.description,
+                            style: const TextStyle(
                               fontSize: 16,
                               color: AppColors.textSecondary,
                               height: 1.5,
@@ -141,17 +145,17 @@ class ProfileScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Bergabung sejak',
-                        style: TextStyle(color: Colors.white70, fontSize: 14),
+                      Text(
+                        userProvider.joinedDate,
+                        style: const TextStyle(color: Colors.white70, fontSize: 14),
                       ),
                       const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Status Akun Aktif',
-                            style: TextStyle(
+                          Text(
+                            userProvider.isAccountActive ? 'Status Akun Aktif' : 'Status Akun Nonaktif',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -172,9 +176,9 @@ class ProfileScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'alikhsanalief@gmail.com',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      Text(
+                        userProvider.email,
+                        style: const TextStyle(color: Colors.white, fontSize: 16),
                       ),
                     ],
                   ),
@@ -182,6 +186,8 @@ class ProfileScreen extends StatelessWidget {
               ),
             ],
           ),
+        );
+          },
         ),
       ),
     );
